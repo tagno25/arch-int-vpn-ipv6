@@ -3,7 +3,7 @@
 function create_openvpn_cli() {
 
 	# define common command lne parameters for openvpn
-	openvpn_cli="/usr/bin/openvpn --reneg-sec 0 --mute-replay-warnings --auth-nocache --setenv VPN_PROV '${VPN_PROV}' --setenv VPN_CLIENT '${VPN_CLIENT}' --setenv DEBUG '${DEBUG}' --setenv VPN_DEVICE_TYPE '${VPN_DEVICE_TYPE}' --setenv VPN_ENABLED '${VPN_ENABLED}' --setenv VPN_REMOTE_SERVER '${VPN_REMOTE_SERVER}' --setenv APPLICATION '${APPLICATION}' --script-security 2 --writepid /root/openvpn.pid --remap-usr1 SIGHUP --log-append /dev/stdout --pull-filter ignore 'up' --pull-filter ignore 'down' --pull-filter ignore 'route-ipv6' --pull-filter ignore 'ifconfig-ipv6' --pull-filter ignore 'tun-ipv6' --pull-filter ignore 'dhcp-option DNS6' --pull-filter ignore 'persist-tun' --pull-filter ignore 'reneg-sec' --up /root/openvpnup.sh --up-delay --up-restart"
+	openvpn_cli="/usr/bin/openvpn --reneg-sec 0 --mute-replay-warnings --auth-nocache --setenv VPN_PROV '${VPN_PROV}' --setenv VPN_CLIENT '${VPN_CLIENT}' --setenv DEBUG '${DEBUG}' --setenv VPN_DEVICE_TYPE '${VPN_DEVICE_TYPE}' --setenv VPN_ENABLED '${VPN_ENABLED}' --setenv VPN_REMOTE_SERVER '${VPN_REMOTE_SERVER}' --setenv APPLICATION '${APPLICATION}' --script-security 2 --writepid /root/openvpn.pid --remap-usr1 SIGHUP --log-append /dev/stdout --pull-filter ignore 'up' --pull-filter ignore 'down' --pull-filter ignore 'persist-tun' --pull-filter ignore 'reneg-sec' --up /root/openvpnup.sh --up-delay --up-restart"
 
 	if [[ -z "${vpn_ping}" ]]; then
 

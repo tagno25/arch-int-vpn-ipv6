@@ -149,12 +149,6 @@ function edit_wireguard() {
 	# insert PostUp/PostDown script lines after [Interface]
 	sed -i -e "/\[Interface\]/a PostUp = '/root/wireguardup.sh'\nPostDown = '/root/wireguarddown.sh'" "${VPN_CONFIG}"
 
-	# removes all ipv6 address and port from wireguard config
-	sed -r -i -e 's/,?(\s+)?[a-f0-9]{4}::?[^,]+(\s+)?,?//g' "${VPN_CONFIG}"
-
-	# removes all ipv6 port only from wireguard config
-	sed -r -i -e 's/,?(\s+)?::[^,]+(\s+)?,?//g' "${VPN_CONFIG}"
-
 }
 
 function run_wireguard() {
@@ -203,8 +197,7 @@ function configure_wireguard() {
 
 	else
 
-		# edit wireguard config to remove ipv6, required for mullvad and possibly other non pia
-		# vpn providers
+		# edit wireguard config
 		edit_wireguard
 
 	fi

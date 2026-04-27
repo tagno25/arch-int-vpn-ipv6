@@ -57,18 +57,6 @@ else
 		# remove down script from ovpn file if present, this is removed as we do not want any other up/down scripts to run
 		sed -i '/^down\s.*/d' "${VPN_CONFIG}"
 
-		# remove ipv6 configuration from ovpn file if present (iptables not configured to support ipv6)
-		sed -i '/^route-ipv6/d' "${VPN_CONFIG}"
-
-		# remove ipv6 configuration from ovpn file if present (iptables not configured to support ipv6)
-		sed -i '/^ifconfig-ipv6/d' "${VPN_CONFIG}"
-
-		# remove ipv6 configuration from ovpn file if present (iptables not configured to support ipv6)
-		sed -i '/^tun-ipv6/d' "${VPN_CONFIG}"
-
-		# remove dhcp option for dns ipv6 configuration from ovpn file if present (dns defined via name_server env var value)
-		sed -i '/^dhcp-option DNS6.*/d' "${VPN_CONFIG}"
-
 		# remove windows specific openvpn options
 		sed -i '/^route-method exe/d' "${VPN_CONFIG}"
 		sed -i '/^service\s.*/d' "${VPN_CONFIG}"

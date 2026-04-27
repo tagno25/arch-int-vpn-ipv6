@@ -44,8 +44,8 @@ function drop_all_ipv4() {
 	# check and set iptables drop
 	if ! iptables -S | grep '^-P' > /dev/null 2>&1; then
 
-			echo "[crit] iptables default policies not available, exiting script..." | ts '%Y-%m-%d %H:%M:%.S'
-			exit 1
+			echo "[warn] iptables default policies not available, skipping iptables drops" | ts '%Y-%m-%d %H:%M:%.S'
+			return 1
 
 	else
 
@@ -62,6 +62,7 @@ function drop_all_ipv4() {
 		# set policy to drop ipv4 for output
 		iptables -P OUTPUT DROP > /dev/null
 
+		return 0
 	fi
 }
 
@@ -71,6 +72,7 @@ function drop_all_ipv6() {
 	if ! ip6tables -S | grep '^-P' > /dev/null 2>&1; then
 
 			echo "[warn] ip6tables default policies not available, skipping ip6tables drops" | ts '%Y-%m-%d %H:%M:%.S'
+			return 1
 
 	else
 
@@ -87,6 +89,7 @@ function drop_all_ipv6() {
 		# set policy to drop ipv6 for output
 		ip6tables -P OUTPUT DROP > /dev/null
 
+		return 0
 	fi
 }
 
@@ -154,38 +157,49 @@ function add_name_servers() {
 function main() {
 
 	# drop all for ipv4
-	drop_all_ipv4
+	noip4=drop_all_ipv4
 
 	# drop all for ipv6
-	drop_all_ipv6
+	noip6=drop_all_ipv6
 
-	# source in tools script
-	# shellcheck source=../local/tools.sh
-	source tools.sh
+	if [[ "$noip4" -ne 0 && "$noip6" -ne 0 ]]; then
+		echo "[crit] iptables and ip6tables default policies not available, skippinting script..." | ts '%Y-%m-%d %H:%M:%.S'
+		exit 1
+	fi
 
-	# insert accept name resolution rules
-	name_resolution '-I'
+	if [[ "$noip4" -ne 1 ]]; then
+		# source in tools script
+		# shellcheck source=../local/tools.sh
+		source tools.sh
 
-	# call function from tools.sh to resolve all vpn endpoints
-	resolve_vpn_endpoints
+		# insert accept name resolution rules
+		name_resolution '-I'
 
-	# delete accept name resolution rules
-	name_resolution '-D'
+		# call function from tools.sh to resolve all vpn endpoints
+		resolve_vpn_endpoints
 
-	# overwrite name servers using value from env var 'NAME_SERVERS'
-	# Note we do this AFTER resolving vpn endpoints to permit name resolution
-	# of the vpn endpoints using whatever the host has defined, including
-	# local name servers - useful for pihole
-	add_name_servers
+		# delete accept name resolution rules
+		name_resolution '-D'
 
-	# run function from tools.sh to create global var 'docker_networking' used below
-	get_docker_networking
+		# overwrite name servers using value from env var 'NAME_SERVERS'
+		# Note we do this AFTER resolving vpn endpoints to permit name resolution
+		# of the vpn endpoints using whatever the host has defined, including
+		# local name servers - useful for pihole
+		add_name_servers
 
-	# call function to add vpn remote endpoints to iptables input accept rule
-	accept_vpn_endpoints "input"
+		# run function from tools.sh to create global var 'docker_networking' used below
+		get_docker_networking
 
-	# call function to add vpn remote endpoints to iptables output accept rule
-	accept_vpn_endpoints "output"
+		# call function to add vpn remote endpoints to iptables input accept rule
+		accept_vpn_endpoints "input"
+
+		# call function to add vpn remote endpoints to iptables output accept rule
+		accept_vpn_endpoints "output"
+	fi
+
+	if [[ "$noip6" -ne 1 ]]; then
+		echo "ipv6 start"
+	fi
 
 }
 
